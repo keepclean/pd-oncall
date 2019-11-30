@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -60,5 +61,29 @@ func (c *Client) Teams() ([]*PDTeam, error) {
 		req.URL = c.BaseURL
 	}
 
+	if !Exists("/tmp/pd-teams-cache.json") {
+		f, err := os.Create("/tmp/pd-teams-cache.json")
+		if err != nil {
+			fmt.Printf("can't create file: %v", err)
+		}
+		if err = json.NewEncoder(f).Encode(teams.Teams); err != nil {
+			fmt.Printf("can't write json: %v", err)
+		}
+	}
+
 	return teams.Teams, nil
+}
+
+func ReadTeamsCacheFile(path string) ([]*PDTeam, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var teams []*PDTeam
+	if err = json.NewDecoder(f).Decode(&teams); err != nil {
+		return nil, err
+	}
+
+	return teams, nil
 }
