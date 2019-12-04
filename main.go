@@ -17,12 +17,19 @@ func main() {
 	app.Version(version)
 
 	teams := app.Command("teams", "show and store in file cache teams which are defined in PD")
-	var teamsCache CacheFile = "/tmp/pd-teams-cache.json"
 
-	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
+	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
+
+	// Create cache file for PD teams
+	var teamsCache CacheFile = "/tmp/pd-teams-cache.json"
+	teamsCache.Create(apiClient)
+
+	// Create config file
+
+	switch cmd {
 	case teams.FullCommand():
-		apiClient := NewPDApiClient(*apiURL, version, *apiToken)
-		teamsCache.Create(apiClient)
+		fmt.Println(cmd)
 	}
 
 	pdTeams, err := teamsCache.Read()
