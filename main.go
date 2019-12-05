@@ -22,22 +22,19 @@ func main() {
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
 	// Create cache file for PD teams
-	var teamsCache CacheFile = "/tmp/pd-teams-cache.json"
+	var teamsCache CacheFile = "${HOME}/.cache/pd-oncall/teams-cache.json"
 	teamsCache.Create(apiClient)
-
-	// Create config file
-
-	switch cmd {
-	case teams.FullCommand():
-		fmt.Println(cmd)
-	}
-
 	pdTeams, err := teamsCache.Read()
 	if err != nil {
 		log.Fatalf("fail to read teams cache file: %v", err)
 	}
 
-	for _, team := range pdTeams {
-		fmt.Println(team.Name)
+	// Create config file
+	var cf ConfigFile = "${HOME}/.config/pd-oncall/config.json"
+	cf.Create(pdTeams)
+
+	switch cmd {
+	case teams.FullCommand():
+		fmt.Println(cmd)
 	}
 }
