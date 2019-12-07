@@ -58,10 +58,10 @@ func (c CacheFile) ExpandPath() string {
 
 func (c CacheFile) Write(t []*PDTeam) {
 	f, err := os.Create(c.ExpandPath())
-
 	if err != nil {
 		log.Println("can't create file: ", err)
 	}
+
 	if err = json.NewEncoder(f).Encode(t); err != nil {
 		log.Println("can't write json: ", err)
 	}

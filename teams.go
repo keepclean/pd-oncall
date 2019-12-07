@@ -9,9 +9,9 @@ import (
 
 type PDTeams struct {
 	Teams  []*PDTeam `json:"teams"`
-	Limit  int       `json:"limit"`
-	Offset int       `json:"offset"`
-	More   bool      `json:"more"`
+	Limit  int       `json:"limit,omitempty"`
+	Offset int       `json:"offset,omitempty"`
+	More   bool      `json:"more,omitempty"`
 }
 
 type PDTeam struct {
