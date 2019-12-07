@@ -40,7 +40,7 @@ func (c ConfigFile) Create(t []*PDTeam) {
 }
 
 func (c ConfigFile) Exist() bool {
-	if _, err := os.Stat(c.String()); os.IsNotExist(err) {
+	if _, err := os.Stat(c.ExpandPath()); os.IsNotExist(err) {
 		return false
 	}
 
