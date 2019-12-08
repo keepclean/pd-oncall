@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
+
+	"github.com/jedib0t/go-pretty/text"
 )
 
 type ConfigFile string
@@ -77,6 +79,30 @@ func (c ConfigFile) Write(t []*PDTeam, teamsNumbers []int) {
 	if err = json.NewEncoder(f).Encode(cf); err != nil {
 		log.Println("can't write json: ", err)
 	}
+}
+
+func (c ConfigFile) Remove() {
+	cf := c.ExpandPath()
+	if err := os.Remove(cf); err != nil {
+		log.Fatalln("can not remove config file", cf, err)
+	}
+	log.Println("Config file", cf, "has been removed")
+}
+
+func (c ConfigFile) Show() {
+	f, err := os.Open(c.ExpandPath())
+	if err != nil {
+		log.Fatalln("can not open the config file", c.ExpandPath(), err)
+	}
+	defer f.Close()
+
+	var cf PDTeams
+	if err = json.NewDecoder(f).Decode(&cf); err != nil {
+		log.Fatalln("can not decode the config file", c.ExpandPath(), err)
+	}
+
+	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
+	fmt.Println(jsonPrettyPrinter(cf))
 }
 
 func printTeamsAsTable(t []*PDTeam) {

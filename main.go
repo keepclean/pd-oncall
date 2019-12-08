@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -16,7 +15,9 @@ func main() {
 	version := "0.0.0"
 	app.Version(version)
 
-	teams := app.Command("teams", "show and store in file cache teams which are defined in PD")
+	config := app.Command("config", "sub command for managing a config file")
+	configRm := config.Flag("rm", "remove config file").Bool()
+	config.Flag("show", "show config file").Bool()
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
@@ -34,7 +35,11 @@ func main() {
 	cf.Create(pdTeams)
 
 	switch cmd {
-	case teams.FullCommand():
-		fmt.Println(cmd)
+	case config.FullCommand():
+		if *configRm {
+			cf.Remove()
+			return
+		}
+		cf.Show()
 	}
 }

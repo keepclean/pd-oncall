@@ -72,6 +72,7 @@ func (c CacheFile) Read() ([]*PDTeam, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	var t []*PDTeam
 	if err = json.NewDecoder(f).Decode(&t); err != nil {
