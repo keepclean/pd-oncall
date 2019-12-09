@@ -22,17 +22,18 @@ func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
-	// Create cache file for PD teams
-	var teamsCache CacheFile = "${HOME}/.cache/pd-oncall/teams-cache.json"
-	teamsCache.Create(apiClient)
-	pdTeams, err := teamsCache.Read()
-	if err != nil {
-		log.Fatalf("fail to read teams cache file: %v", err)
-	}
-
-	// Create config file
 	var cf ConfigFile = "${HOME}/.config/pd-oncall/config.json"
-	cf.Create(pdTeams)
+	if !cf.Exist() {
+		log.Printf("Config file %s doesn't exist;\n", cf)
+
+		var teamsCache CacheFile = "${HOME}/.cache/pd-oncall/teams-cache.json"
+		teamsCache.Create(apiClient)
+		pdTeams, err := teamsCache.Read()
+		if err != nil {
+			log.Fatalf("fail to read teams cache file: %v", err)
+		}
+		cf.Create(pdTeams)
+	}
 
 	switch cmd {
 	case config.FullCommand():

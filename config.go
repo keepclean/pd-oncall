@@ -21,11 +21,6 @@ func (c ConfigFile) String() string {
 }
 
 func (c ConfigFile) Create(t []*PDTeam) {
-	if c.Exist() {
-		return
-	}
-
-	log.Printf("Config file %s doesn't exist;\n", c)
 	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
 		log.Fatalln("can't create directory for cache file: ", err)
 	}
