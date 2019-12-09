@@ -84,7 +84,7 @@ func (c ConfigFile) Remove() {
 	log.Println("Config file", cf, "has been removed")
 }
 
-func (c ConfigFile) Show() {
+func (c ConfigFile) Read() *PDTeams {
 	f, err := os.Open(c.ExpandPath())
 	if err != nil {
 		log.Fatalln("can not open the config file", c.ExpandPath(), err)
@@ -95,6 +95,12 @@ func (c ConfigFile) Show() {
 	if err = json.NewDecoder(f).Decode(&cf); err != nil {
 		log.Fatalln("can not decode the config file", c.ExpandPath(), err)
 	}
+
+	return &cf
+}
+
+func (c ConfigFile) Show() {
+	cf := c.Read()
 
 	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
 	fmt.Println(jsonPrettyPrinter(cf))

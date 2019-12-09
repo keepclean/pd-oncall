@@ -19,6 +19,8 @@ func main() {
 	configRm := config.Flag("rm", "remove config file").Bool()
 	config.Flag("show", "show config file").Bool()
 
+	now := app.Command("now", "list currently oncall")
+
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
@@ -34,6 +36,7 @@ func main() {
 		}
 		cf.Create(pdTeams)
 	}
+	teams := cf.Read()
 
 	switch cmd {
 	case config.FullCommand():
@@ -42,5 +45,8 @@ func main() {
 			return
 		}
 		cf.Show()
+	case now.FullCommand():
+		oncallNow(apiClient, teams)
+
 	}
 }
