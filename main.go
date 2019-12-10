@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -21,6 +22,8 @@ func main() {
 
 	now := app.Command("now", "list currently oncall")
 
+	schedules := app.Command("schedules", "list currently schedules")
+
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
@@ -32,7 +35,7 @@ func main() {
 		teamsCache.Create(apiClient)
 		pdTeams, err := teamsCache.Read()
 		if err != nil {
-			log.Fatalf("fail to read teams cache file: %v", err)
+			log.Fatalln("fail to read teams cache file:", err)
 		}
 		cf.Create(pdTeams)
 	}
@@ -47,6 +50,13 @@ func main() {
 		cf.Show()
 	case now.FullCommand():
 		oncallNow(apiClient, teams)
-
+	case schedules.FullCommand():
+		scs, err := apiClient.Schedules()
+		if err != nil {
+			log.Fatalln("fail to get schedules from PD:", err)
+		}
+		for _, s := range scs {
+			fmt.Println(s.ID, s.Name)
+		}
 	}
 }
