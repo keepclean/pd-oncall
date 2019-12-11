@@ -11,6 +11,7 @@ func main() {
 	app := kingpin.New("pd-oncall", "A command-line tool for represeting PagerDuty oncall schedule.")
 	apiToken := app.Flag("api-token", "Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN;").Envar("PAGERDUTY_API_TOKEN").Required().String()
 	apiURL := app.Flag("api-url", "API URL.").Default("https://api.pagerduty.com/").URL()
+	tableStyle := app.Flag("table-style", "Table style: rounded, box, colored").Default("rounded").String()
 
 	version := "0.0.0"
 	app.Version(version)
@@ -46,6 +47,6 @@ func main() {
 		}
 		cf.Show()
 	case now.FullCommand():
-		oncallNow(apiClient, schedules)
+		oncallNow(apiClient, schedules, *tableStyle)
 	}
 }
