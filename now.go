@@ -10,11 +10,11 @@ import (
 	"github.com/jedib0t/go-pretty/table"
 )
 
-func oncallNow(apiClient *Client, cf *PDTeams) {
+func oncallNow(apiClient *Client, cf *Schedules) {
 	var data []table.Row
 	var mutex = &sync.Mutex{}
 	var wg sync.WaitGroup
-	for _, shift := range cf.Teams {
+	for _, shift := range cf.Schedules {
 		wg.Add(1)
 		go func(sName, sID string) {
 			defer wg.Done()

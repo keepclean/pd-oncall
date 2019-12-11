@@ -20,12 +20,12 @@ func (c ConfigFile) String() string {
 	return fmt.Sprint(string(c))
 }
 
-func (c ConfigFile) Create(t []*PDTeam) {
+func (c ConfigFile) Create(t []*Schedule) {
 	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
 		log.Fatalln("can't create directory for cache file: ", err)
 	}
 
-	printTeamsAsTable(t)
+	printSchedulesAsTable(t)
 
 	teamsNumbers, err := getUserInput()
 	if err != nil {
@@ -52,9 +52,9 @@ func (c ConfigFile) ExpandPath() string {
 	return os.ExpandEnv(c.String())
 }
 
-func (c ConfigFile) Write(t []*PDTeam, teamsNumbers []int) {
+func (c ConfigFile) Write(t []*Schedule, teamsNumbers []int) {
 	len_t := len(t)
-	var tSubset []*PDTeam
+	var tSubset []*Schedule
 
 	for _, n := range teamsNumbers {
 		if n > len_t || n < 1 {
@@ -70,7 +70,7 @@ func (c ConfigFile) Write(t []*PDTeam, teamsNumbers []int) {
 		log.Println("can't create file: ", err)
 	}
 
-	var cf PDTeams = PDTeams{Teams: tSubset}
+	var cf Schedules = Schedules{Schedules: tSubset}
 	if err = json.NewEncoder(f).Encode(cf); err != nil {
 		log.Println("can't write json: ", err)
 	}
@@ -84,14 +84,14 @@ func (c ConfigFile) Remove() {
 	log.Println("Config file", cf, "has been removed")
 }
 
-func (c ConfigFile) Read() *PDTeams {
+func (c ConfigFile) Read() *Schedules {
 	f, err := os.Open(c.ExpandPath())
 	if err != nil {
 		log.Fatalln("can not open the config file", c.ExpandPath(), err)
 	}
 	defer f.Close()
 
-	var cf PDTeams
+	var cf Schedules
 	if err = json.NewDecoder(f).Decode(&cf); err != nil {
 		log.Fatalln("can not decode the config file", c.ExpandPath(), err)
 	}
@@ -106,12 +106,12 @@ func (c ConfigFile) Show() {
 	fmt.Println(jsonPrettyPrinter(cf))
 }
 
-func printTeamsAsTable(t []*PDTeam) {
+func printSchedulesAsTable(t []*Schedule) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 	defer w.Flush()
 
-	rows := 15
 	len_t := len(t)
+	rows := rowsNumber(len_t)
 	columns := len_t / rows
 	remainder := len_t % rows
 
@@ -123,11 +123,26 @@ func printTeamsAsTable(t []*PDTeam) {
 		}
 
 		if remainder > 0 {
-			s = s + fmt.Sprintf("%d) %s\t", len_t-remainder+1, t[-remainder].Name)
+			s = s + fmt.Sprintf("%d) %s\t", len_t-remainder+1, t[len_t-remainder].Name)
 			remainder--
 		}
 
 		fmt.Fprintln(w, s)
+	}
+}
+
+func rowsNumber(i int) int {
+	switch {
+	case i > 150:
+		return 50
+	case i > 120:
+		return 40
+	case i > 90:
+		return 30
+	case i > 60:
+		return 20
+	default:
+		return 25
 	}
 }
 

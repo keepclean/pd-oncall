@@ -26,13 +26,12 @@ func (c CacheFile) Create(apiClient *Client) {
 		log.Fatalln("can't create directory for cache file: ", err)
 	}
 
-	pdTeams, err := apiClient.Teams()
+	schedules, err := apiClient.Schedules()
 	if err != nil {
 		log.Println("failt to query PD API: ", err)
 	}
 
-	c.Write(pdTeams)
-
+	c.Write(schedules)
 }
 
 func (c CacheFile) Exist() bool {
@@ -40,8 +39,8 @@ func (c CacheFile) Exist() bool {
 	if os.IsNotExist(err) {
 		return false
 	}
-	// if modification of file more than a week, refresh it
-	if time.Since(fInfo.ModTime()) > (time.Hour * 168) {
+	// if modification of file more than four weeks, refresh it
+	if time.Since(fInfo.ModTime()) > (time.Hour * 672) {
 		return false
 	}
 
@@ -56,7 +55,7 @@ func (c CacheFile) ExpandPath() string {
 	return os.ExpandEnv(c.String())
 }
 
-func (c CacheFile) Write(t []*PDTeam) {
+func (c CacheFile) Write(t []*Schedule) {
 	f, err := os.Create(c.ExpandPath())
 	if err != nil {
 		log.Println("can't create file: ", err)
@@ -67,14 +66,14 @@ func (c CacheFile) Write(t []*PDTeam) {
 	}
 }
 
-func (c CacheFile) Read() ([]*PDTeam, error) {
+func (c CacheFile) Read() ([]*Schedule, error) {
 	f, err := os.Open(c.ExpandPath())
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	var t []*PDTeam
+	var t []*Schedule
 	if err = json.NewDecoder(f).Decode(&t); err != nil {
 		return nil, err
 	}

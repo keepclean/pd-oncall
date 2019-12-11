@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -22,8 +21,6 @@ func main() {
 
 	now := app.Command("now", "list currently oncall")
 
-	schedules := app.Command("schedules", "list currently schedules")
-
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
@@ -31,15 +28,15 @@ func main() {
 	if !cf.Exist() {
 		log.Printf("Config file %s doesn't exist;\n", cf)
 
-		var teamsCache CacheFile = "${HOME}/.cache/pd-oncall/teams-cache.json"
-		teamsCache.Create(apiClient)
-		pdTeams, err := teamsCache.Read()
+		var schedulesCache CacheFile = "${HOME}/.cache/pd-oncall/schedules-cache.json"
+		schedulesCache.Create(apiClient)
+		pdSchedules, err := schedulesCache.Read()
 		if err != nil {
-			log.Fatalln("fail to read teams cache file:", err)
+			log.Fatalln("fail to read schedules cache file:", err)
 		}
-		cf.Create(pdTeams)
+		cf.Create(pdSchedules)
 	}
-	teams := cf.Read()
+	schedules := cf.Read()
 
 	switch cmd {
 	case config.FullCommand():
@@ -49,14 +46,6 @@ func main() {
 		}
 		cf.Show()
 	case now.FullCommand():
-		oncallNow(apiClient, teams)
-	case schedules.FullCommand():
-		scs, err := apiClient.Schedules()
-		if err != nil {
-			log.Fatalln("fail to get schedules from PD:", err)
-		}
-		for _, s := range scs {
-			fmt.Println(s.ID, s.Name)
-		}
+		oncallNow(apiClient, schedules)
 	}
 }
