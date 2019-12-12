@@ -141,13 +141,15 @@ func rowsNumber(i int) int {
 		return 30
 	case i > 60:
 		return 20
+	case i < 15:
+		return i
 	default:
-		return 25
+		return 15
 	}
 }
 
 func getUserInput() ([]int, error) {
-	fmt.Print("Please select command numbers, separate them by commas: ")
+	fmt.Print("Please select numbers, separate them by commas: ")
 	reader := bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
 	if err != nil {

@@ -33,5 +33,5 @@ func oncallNow(apiClient *Client, cf *Schedules, tableStyle string) {
 	sort.Slice(data, func(i, j int) bool { return data[i][0].(string) < data[j][0].(string) })
 
 	fields := table.Row{"SHIFT", "ENGINEER"}
-	printTable(data, fields, tableStyle)
+	printTable(data, fields, "", tableStyle)
 }
