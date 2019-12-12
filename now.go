@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"sort"
 	"sync"
@@ -15,17 +14,16 @@ func oncallNow(apiClient *Client, cf *Schedules, tableStyle string) {
 	var wg sync.WaitGroup
 	for _, shift := range cf.Schedules {
 		wg.Add(1)
-		go func(sID, sName string) {
+		go func(ID, Name string) {
 			defer wg.Done()
-			schedule, err := apiClient.finalSchedule(sID, "", "")
+			schedule, err := apiClient.Schedule(ID, "", "")
 			if err != nil {
-				log.Printf("Failed to get schedule for %s: %v\n", sName, err)
+				log.Printf("Failed to get schedule for %s: %v\n", Name, err)
 				return
 			}
 
-			fmt.Printf("%s - %s: %v\n", sID, sName, schedule)
 			mutex.Lock()
-			data = append(data, table.Row{sName, schedule.Schedule.Oncall.EntryUser.Name})
+			data = append(data, table.Row{Name, schedule.Schedule.Oncall.User.Name})
 			mutex.Unlock()
 
 		}(shift.ID, shift.Name)

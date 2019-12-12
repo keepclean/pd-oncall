@@ -70,8 +70,8 @@ type PDScheduleResponse struct {
 
 type PDScheduleItems struct {
 	FinalSchedule *FinalSchedule `json:"final_schedule"`
-	Oncall        *onCall        `json:"oncall"`
-	Users         []*entryUser   `json:"users"`
+	Oncall        *OnCall        `json:"oncall"`
+	Users         []*User        `json:"users"`
 }
 
 type FinalSchedule struct {
@@ -79,22 +79,22 @@ type FinalSchedule struct {
 }
 
 type ScheduleEntry struct {
-	Start     string     `json:"start"`
-	End       string     `json:"end"`
-	EntryUser *entryUser `json:"user"`
+	Start string `json:"start"`
+	End   string `json:"end"`
+	User  *User  `json:"user"`
 }
 
-type onCall struct {
-	EntryUser *entryUser `json:"user"`
+type OnCall struct {
+	User *User `json:"user"`
 }
 
-type entryUser struct {
+type User struct {
 	ID   string `json:"id"`
 	Name string `json:"summary"`
 }
 
-func (c *Client) finalSchedule(ID, startdate, enddate string) (*PDScheduleResponse, error) {
-	c.BaseURL.Path = "/schedules"
+func (c *Client) Schedule(ID, startdate, enddate string) (*PDScheduleResponse, error) {
+	c.BaseURL.Path = fmt.Sprint("/schedules/", ID)
 	q := c.BaseURL.Query()
 	q.Set("include_oncall", "true")
 	if startdate != "" {
@@ -107,7 +107,7 @@ func (c *Client) finalSchedule(ID, startdate, enddate string) (*PDScheduleRespon
 
 	req, err := http.NewRequest("GET", c.BaseURL.String(), nil)
 	if err != nil {
-		return nil, err
+		return &PDScheduleResponse{}, err
 	}
 
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
@@ -116,10 +116,10 @@ func (c *Client) finalSchedule(ID, startdate, enddate string) (*PDScheduleRespon
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		return &PDScheduleResponse{}, err
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("%s", resp.Status)
+		return &PDScheduleResponse{}, fmt.Errorf("%s", resp.Status)
 	}
 	defer resp.Body.Close()
 
