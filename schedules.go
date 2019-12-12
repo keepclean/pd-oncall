@@ -63,3 +63,70 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 
 	return schedules.Schedules, nil
 }
+
+type PDScheduleResponse struct {
+	Schedule *PDScheduleItems `json:"schedule"`
+}
+
+type PDScheduleItems struct {
+	FinalSchedule *FinalSchedule `json:"final_schedule"`
+	Oncall        *onCall        `json:"oncall"`
+	Users         []*entryUser   `json:"users"`
+}
+
+type FinalSchedule struct {
+	RenderedScheduleEntries []*ScheduleEntry `json:"rendered_schedule_entries"`
+}
+
+type ScheduleEntry struct {
+	Start     string     `json:"start"`
+	End       string     `json:"end"`
+	EntryUser *entryUser `json:"user"`
+}
+
+type onCall struct {
+	EntryUser *entryUser `json:"user"`
+}
+
+type entryUser struct {
+	ID   string `json:"id"`
+	Name string `json:"summary"`
+}
+
+func (c *Client) finalSchedule(ID, startdate, enddate string) (*PDScheduleResponse, error) {
+	c.BaseURL.Path = "/schedules"
+	q := c.BaseURL.Query()
+	q.Set("include_oncall", "true")
+	if startdate != "" {
+		q.Set("since", startdate)
+	}
+	if enddate != "" {
+		q.Set("until", enddate)
+	}
+	c.BaseURL.RawQuery = q.Encode()
+
+	req, err := http.NewRequest("GET", c.BaseURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
+	req.Header.Set("Authorization", fmt.Sprintf("Token token=%s", c.Token))
+	req.Header.Set("User-Agent", c.UserAgent)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("%s", resp.Status)
+	}
+	defer resp.Body.Close()
+
+	var r PDScheduleResponse
+	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
