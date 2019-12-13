@@ -5,7 +5,43 @@ import (
 	"time"
 
 	"github.com/rickar/cal"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
+
+type Dates struct {
+	Since, Until string
+}
+
+func NewDates(c *kingpin.CmdClause) *Dates {
+	t := time.Now()
+	d := &Dates{}
+
+	c.Flag("since", "The start of the date range over which you want to search.").Default(t.Format("2006-01-02")).StringVar(&d.Since)
+
+	c.Flag("until", "The end of the date range over which you want to search.").Default(t.AddDate(0, 0, 7).Format("2006-01-02")).StringVar(&d.Until)
+
+	return d
+}
+
+func (d *Dates) CheckDates() {
+	t1, err := time.Parse("2006-01-02", d.Since)
+	if err != nil {
+		log.Fatalln("[CheckDates] for", t1, err)
+	}
+
+	t2, err := time.Parse("2006-01-02", d.Until)
+	if err != nil {
+		log.Fatalln("[CheckDates] for", t2, err)
+	}
+
+	if t2.Sub(t1) < 0 {
+		t2 = t1.AddDate(0, 0, 7)
+		log.Println("\"until\" time is in the past relatively to \"since\"; Using \"until\" as: \"since\" plus a week.")
+	}
+
+	d.Since = t1.Format("2006-01-02")
+	d.Until = t2.Format("2006-01-02")
+}
 
 func convertTime(t, f string) (string, error) {
 	if f == "" {
@@ -55,12 +91,4 @@ func weekday(t string) (time.Weekday, error) {
 	}
 
 	return parsedTime.Weekday(), nil
-}
-
-func checkDate(s string) string {
-	t, err := time.Parse("2006-01-02", s)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return t.Format("2006-01-02")
 }

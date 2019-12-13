@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -24,9 +23,7 @@ func main() {
 	now := app.Command("now", "list currently oncall for schedules in a config file")
 
 	schedule := app.Command("schedule", "Oncall schedule information")
-	t := time.Now()
-	since := schedule.Flag("since", "The start of the date range over which you want to search.").Default(t.Format("2006-01-02")).String()
-	until := schedule.Flag("until", "The end of the date range over which you want to search.").Default(t.AddDate(0, 0, 7).Format("2006-01-02")).String()
+	scheduleDates := NewDates(schedule)
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
@@ -55,8 +52,7 @@ func main() {
 	case now.FullCommand():
 		oncallNow(apiClient, schedules, *tableStyle)
 	case schedule.FullCommand():
-		*since = checkDate(*since)
-		*until = checkDate(*until)
-		oncallShift(apiClient, schedules, *since, *until, *tableStyle)
+		scheduleDates.CheckDates()
+		oncallShift(apiClient, schedules, scheduleDates.Since, scheduleDates.Until, *tableStyle)
 	}
 }
