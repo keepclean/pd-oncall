@@ -27,7 +27,7 @@ func (c ConfigFile) Create(t []*Schedule) {
 
 	printSchedulesAsTable(t)
 
-	teamsNumbers, err := getUserInput()
+	teamsNumbers, err := getUserInput("Please select numbers, separate them by commas: ")
 	if err != nil {
 		log.Fatalln("[ConfigFile.Create] fail to read user input:", err)
 	}
@@ -149,8 +149,8 @@ func rowsNumber(i int) int {
 	}
 }
 
-func getUserInput() ([]int, error) {
-	fmt.Print("Please select numbers, separate them by commas: ")
+func getUserInput(prompt string) ([]int, error) {
+	fmt.Print(prompt)
 	reader := bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
 	if err != nil {
