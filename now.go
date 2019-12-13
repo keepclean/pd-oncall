@@ -25,7 +25,6 @@ func oncallNow(apiClient *Client, cf *Schedules, tableStyle string) {
 			mutex.Lock()
 			data = append(data, table.Row{Name, schedule.Schedule.Oncall.User.Name})
 			mutex.Unlock()
-
 		}(shift.ID, shift.Name)
 	}
 	wg.Wait()

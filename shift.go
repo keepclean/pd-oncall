@@ -18,7 +18,7 @@ func oncallShift(apiClient *Client, cf *Schedules, since, until, tableStyle stri
 		log.Fatalf("Failed to get schedule: %v", err)
 	}
 
-	var data []table.Row
+	data := make([]table.Row, 0)
 	for _, entry := range schedule.Schedule.FinalSchedule.RenderedScheduleEntries {
 		start, err := convertTime(entry.Start, "")
 		if err != nil {

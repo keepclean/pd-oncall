@@ -33,7 +33,6 @@ func (c ConfigFile) Create(t []*Schedule) {
 	}
 
 	c.Write(t, teamsNumbers)
-
 }
 
 func (c ConfigFile) Exist() bool {
@@ -53,11 +52,11 @@ func (c ConfigFile) ExpandPath() string {
 }
 
 func (c ConfigFile) Write(t []*Schedule, teamsNumbers []int) {
-	len_t := len(t)
-	var tSubset []*Schedule
+	lenT := len(t)
+	tSubset := make([]*Schedule, 0)
 
 	for _, n := range teamsNumbers {
-		if n > len_t || n < 1 {
+		if n > lenT || n < 1 {
 			log.Println("There is no a team with number in the list:", n)
 			continue
 		}
@@ -81,6 +80,7 @@ func (c ConfigFile) Remove() {
 	if err := os.Remove(cf); err != nil {
 		log.Fatalln("can not remove config file", cf, err)
 	}
+
 	log.Println("Config file", cf, "has been removed")
 }
 
@@ -110,20 +110,21 @@ func printSchedulesAsTable(t []*Schedule) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 	defer w.Flush()
 
-	len_t := len(t)
-	rows := rowsNumber(len_t)
-	columns := len_t / rows
-	remainder := len_t % rows
+	lenT := len(t)
+	rows := rowsNumber(lenT)
+	columns := lenT / rows
+	remainder := lenT % rows
+	startFrom := 1
 
 	for r := 0; r < rows; r++ {
 		var s string
 		for c := 0; c < columns; c++ {
 			index := c*rows + r
-			s = s + fmt.Sprintf("%d) %s\t", index+1, t[index].Name)
+			s += fmt.Sprintf("%d) %s\t", index+startFrom, t[index].Name)
 		}
 
 		if remainder > 0 {
-			s = s + fmt.Sprintf("%d) %s\t", len_t-remainder+1, t[len_t-remainder].Name)
+			s += fmt.Sprintf("%d) %s\t", lenT-remainder+startFrom, t[lenT-remainder].Name)
 			remainder--
 		}
 
@@ -157,7 +158,7 @@ func getUserInput() ([]int, error) {
 	}
 	input = strings.Trim(input, "\n")
 
-	var result []int
+	result := make([]int, 0)
 
 	for _, s := range strings.Split(input, ",") {
 		i, err := strconv.Atoi(strings.TrimSpace(s))

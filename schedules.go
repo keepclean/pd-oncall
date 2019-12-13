@@ -93,8 +93,8 @@ type User struct {
 	Name string `json:"summary"`
 }
 
-func (c *Client) Schedule(ID, startdate, enddate string) (*PDScheduleResponse, error) {
-	c.BaseURL.Path = fmt.Sprint("/schedules/", ID)
+func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, error) {
+	c.BaseURL.Path = fmt.Sprint("/schedules/", id)
 	q := c.BaseURL.Query()
 	q.Set("include_oncall", "true")
 	if startdate != "" {
