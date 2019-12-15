@@ -25,6 +25,9 @@ func main() {
 	schedule := app.Command("schedule", "Oncall schedule information")
 	scheduleDates := NewDates(schedule)
 
+	report := app.Command("report", "generates report")
+	reportDates := NewDates(report)
+
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
@@ -54,5 +57,8 @@ func main() {
 	case schedule.FullCommand():
 		scheduleDates.CheckDates()
 		oncallShift(apiClient, schedules, scheduleDates.Since, scheduleDates.Until, *tableStyle)
+	case report.FullCommand():
+		reportDates.CheckDates()
+		oncallReport(apiClient, schedules, reportDates.Since, reportDates.Until, *tableStyle)
 	}
 }
