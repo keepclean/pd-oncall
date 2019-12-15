@@ -22,8 +22,13 @@ func oncallNow(apiClient *Client, cf *Schedules, tableStyle string) {
 				return
 			}
 
+			var user string
+			if schedule.Schedule.Oncall != nil {
+				user = schedule.Schedule.Oncall.User.Name
+			}
+
 			mutex.Lock()
-			data = append(data, table.Row{Name, schedule.Schedule.Oncall.User.Name})
+			data = append(data, table.Row{Name, user})
 			mutex.Unlock()
 		}(shift.ID, shift.Name)
 	}
