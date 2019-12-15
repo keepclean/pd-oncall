@@ -6,7 +6,7 @@ import (
 	"github.com/jedib0t/go-pretty/table"
 )
 
-func printTable(data []table.Row, fields table.Row, title, style string) {
+func printTable(data []table.Row, fields table.Row, title, style, sortBy string) {
 	var tableStyles = map[string]table.Style{
 		"box":     table.StyleDefault,
 		"rounded": table.StyleRounded,
@@ -17,6 +17,9 @@ func printTable(data []table.Row, fields table.Row, title, style string) {
 	t.SetStyle(tableStyles[style])
 	if title != "" {
 		t.SetTitle(title)
+	}
+	if sortBy != "" {
+		t.SortBy([]table.SortBy{{Name: sortBy, Mode: table.Dsc}})
 	}
 	t.AppendHeader(fields)
 	t.AppendRows(data)

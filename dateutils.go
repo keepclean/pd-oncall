@@ -17,7 +17,6 @@ func NewDates(c *kingpin.CmdClause) *Dates {
 	d := &Dates{}
 
 	c.Flag("since", "The start of the date range over which you want to search.").Default(t.Format("2006-01-02")).StringVar(&d.Since)
-
 	c.Flag("until", "The end of the date range over which you want to search.").Default(t.AddDate(0, 0, 7).Format("2006-01-02")).StringVar(&d.Until)
 
 	return d

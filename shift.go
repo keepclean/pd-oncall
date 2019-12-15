@@ -43,5 +43,5 @@ func oncallShift(apiClient *Client, cf *Schedules, since, until, tableStyle stri
 	}
 
 	fields := table.Row{"SINCE", "WEEKDAY", "ENGINEER", "HOLIDAY"}
-	printTable(data, fields, Name, tableStyle)
+	printTable(data, fields, Name, tableStyle, "")
 }
