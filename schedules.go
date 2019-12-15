@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -94,8 +95,9 @@ type User struct {
 }
 
 func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, error) {
-	c.BaseURL.Path = fmt.Sprint("/schedules/", id)
-	q := c.BaseURL.Query()
+	path := &url.URL{Path: fmt.Sprint("/schedules/", id)}
+	u := c.BaseURL.ResolveReference(path)
+	q := u.Query()
 	q.Set("include_oncall", "true")
 	if startdate != "" {
 		q.Set("since", startdate)
@@ -103,9 +105,9 @@ func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, e
 	if enddate != "" {
 		q.Set("until", enddate)
 	}
-	c.BaseURL.RawQuery = q.Encode()
+	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest("GET", c.BaseURL.String(), nil)
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return &PDScheduleResponse{}, err
 	}
