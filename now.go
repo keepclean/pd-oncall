@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/jedib0t/go-pretty/table"
 )
@@ -34,5 +36,9 @@ func oncallNow(apiClient *Client, cf *Schedules, tableStyle string) {
 	wg.Wait()
 
 	fields := table.Row{"SHIFT", "ENGINEER"}
-	printTable(data, fields, "", tableStyle, "SHIFT")
+	printTable(
+		data, fields,
+		fmt.Sprintf("Oncall at %s", time.Now().Format("2006-01-02 15:04")),
+		tableStyle, "SHIFT",
+	)
 }

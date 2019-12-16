@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -43,5 +44,6 @@ func oncallShift(apiClient *Client, cf *Schedules, since, until, tableStyle stri
 	}
 
 	fields := table.Row{"SINCE", "WEEKDAY", "ENGINEER", "HOLIDAY"}
-	printTable(data, fields, Name, tableStyle, "")
+	title := fmt.Sprintf("%s (%s - %s)", Name, since, until)
+	printTable(data, fields, title, tableStyle, "")
 }

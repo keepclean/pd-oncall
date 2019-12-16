@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/jedib0t/go-pretty/table"
@@ -52,5 +53,6 @@ func oncallReport(apiClient *Client, cf *Schedules, since, until, tableStyle str
 	}
 
 	fields := table.Row{"ENGINEER", "WEEKEND", "HOLIDAY", "TOTAL"}
-	printTable(data, fields, Name, tableStyle, "TOTAL")
+	title := fmt.Sprintf("%s (%s - %s)", Name, since, until)
+	printTable(data, fields, title, tableStyle, "TOTAL")
 }

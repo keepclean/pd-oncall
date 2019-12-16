@@ -12,6 +12,7 @@ func printTable(data []table.Row, fields table.Row, title, style, sortBy string)
 		"rounded": table.StyleRounded,
 		"colored": table.StyleColoredBright,
 	}
+
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(tableStyles[style])
