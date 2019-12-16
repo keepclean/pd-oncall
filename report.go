@@ -54,5 +54,5 @@ func oncallReport(apiClient *Client, cf *Schedules, since, until, tableStyle str
 
 	fields := table.Row{"ENGINEER", "WEEKEND", "HOLIDAY", "TOTAL"}
 	title := fmt.Sprintf("%s (%s - %s)", Name, since, until)
-	printTable(data, fields, title, tableStyle, "TOTAL")
+	printTable(data, fields, title, tableStyle, "TOTAL", table.DscNumeric)
 }

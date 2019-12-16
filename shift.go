@@ -45,5 +45,5 @@ func oncallShift(apiClient *Client, cf *Schedules, since, until, tableStyle stri
 
 	fields := table.Row{"SINCE", "WEEKDAY", "ENGINEER", "HOLIDAY"}
 	title := fmt.Sprintf("%s (%s - %s)", Name, since, until)
-	printTable(data, fields, title, tableStyle, "")
+	printTable(data, fields, title, tableStyle, "", -1)
 }

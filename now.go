@@ -39,6 +39,6 @@ func oncallNow(apiClient *Client, cf *Schedules, tableStyle string) {
 	printTable(
 		data, fields,
 		fmt.Sprintf("Oncall at %s", time.Now().Format("2006-01-02 15:04")),
-		tableStyle, "SHIFT",
+		tableStyle, "SHIFT", table.Asc,
 	)
 }
