@@ -33,8 +33,11 @@ func main() {
 	report := app.Command("report", "generates report")
 	reportDates := NewDates(report)
 
-	roster := app.Command("roster", "shows roster for all known schedules")
+	roster := app.Command("roster", "roster for all known schedules")
 	rosterDates := NewDates(roster)
+
+	user := app.Command("user", "oncall schedule for user")
+	userDates := NewDates(user)
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
@@ -76,6 +79,9 @@ func main() {
 		oncallReport(apiClient, schedules, reportDates.Since, reportDates.Until, *tableStyle)
 	case roster.FullCommand():
 		rosterDates.CheckDates()
+		oncallRoster(apiClient, schedules, rosterDates.Since, rosterDates.Until, *tableStyle)
+	case user.FullCommand():
+		userDates.CheckDates()
 		oncallRoster(apiClient, schedules, rosterDates.Since, rosterDates.Until, *tableStyle)
 	}
 }

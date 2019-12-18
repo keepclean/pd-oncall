@@ -9,17 +9,18 @@ import (
 )
 
 type Schedules struct {
-	Schedules []*Schedule `json:"schedules"`
-	Limit     int         `json:"limit,omitempty"`
-	Offset    int         `json:"offset,omitempty"`
-	More      bool        `json:"more,omitempty"`
+	Schedules []*Schedule       `json:"schedules"`
+	Limit     int               `json:"limit,omitempty"`
+	Offset    int               `json:"offset,omitempty"`
+	More      bool              `json:"more,omitempty"`
+	Users     map[string]string `json:"users,omitempty"`
 }
 
 type Schedule struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"summary"`
-	Description string  `json:"description"`
-	Teams       []*Team `json:"teams"`
+	Description string  `json:"description,omitempty"`
+	Users       []*User `json:"users,omitempty"`
 }
 
 func (c *Client) Schedules() ([]*Schedule, error) {
@@ -91,8 +92,9 @@ type OnCall struct {
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"summary"`
+	ID      string `json:"id"`
+	Name    string `json:"summary"`
+	Deleted string `json:"deleted_at,omitempty"`
 }
 
 func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, error) {

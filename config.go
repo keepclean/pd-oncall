@@ -54,6 +54,7 @@ func (c ConfigFile) ExpandPath() string {
 func (c ConfigFile) Write(t []*Schedule, teamsNumbers []int) {
 	lenT := len(t)
 	tSubset := make([]*Schedule, 0)
+	users := make(map[string]string)
 
 	for _, n := range teamsNumbers {
 		if n > lenT || n < 1 {
@@ -61,7 +62,17 @@ func (c ConfigFile) Write(t []*Schedule, teamsNumbers []int) {
 			continue
 		}
 
-		tSubset = append(tSubset, t[n-1])
+		item := t[n-1]
+		tSubset = append(tSubset, &Schedule{item.ID, item.Name, item.Description, []*User{}})
+		for _, user := range item.Users {
+			if user.Deleted != "" {
+				continue
+			}
+
+			if _, ok := users[user.ID]; !ok {
+				users[user.ID] = user.Name
+			}
+		}
 	}
 
 	f, err := os.Create(c.ExpandPath())
@@ -69,7 +80,7 @@ func (c ConfigFile) Write(t []*Schedule, teamsNumbers []int) {
 		log.Println("can't create file: ", err)
 	}
 
-	var cf Schedules = Schedules{Schedules: tSubset}
+	var cf Schedules = Schedules{Schedules: tSubset, Users: users}
 	if err = json.NewEncoder(f).Encode(cf); err != nil {
 		log.Println("can't write json: ", err)
 	}
