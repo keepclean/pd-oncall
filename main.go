@@ -19,6 +19,11 @@ func main() {
 	config := app.Command("config", "sub command for managing a config file")
 	configRm := config.Flag("rm", "remove config file").Bool()
 	config.Flag("show", "show config file").Bool()
+	// configFile := config.Flag("file", "Path to config file").Default("${HOME}/.config/pd-oncall/config.json").String()
+
+	cache := app.Command("cache", "sub command for managing a cache file")
+	cacheRm := cache.Flag("rm", "remove cache file").Bool()
+	cache.Flag("show", "show cache file").Bool()
 
 	now := app.Command("now", "list currently oncall for schedules in a config file")
 
@@ -35,12 +40,12 @@ func main() {
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
 	var cf ConfigFile = "${HOME}/.config/pd-oncall/config.json"
+	var sc CacheFile = "${HOME}/.cache/pd-oncall/schedules-cache.json"
 	if !cf.Exist() {
 		log.Printf("Config file %s doesn't exist;\n", cf)
 
-		var schedulesCache CacheFile = "${HOME}/.cache/pd-oncall/schedules-cache.json"
-		schedulesCache.Create(apiClient)
-		pdSchedules, err := schedulesCache.Read()
+		sc.Create(apiClient)
+		pdSchedules, err := sc.Read()
 		if err != nil {
 			log.Fatalln("fail to read schedules cache file:", err)
 		}
@@ -55,6 +60,12 @@ func main() {
 			return
 		}
 		cf.Show()
+	case cache.FullCommand():
+		if *cacheRm {
+			sc.Remove()
+			return
+		}
+		sc.Show()
 	case now.FullCommand():
 		oncallNow(apiClient, schedules, *tableStyle)
 	case schedule.FullCommand():

@@ -16,9 +16,10 @@ type Schedules struct {
 }
 
 type Schedule struct {
-	ID          string `json:"id"`
-	Name        string `json:"summary"`
-	Description string `json:"description"`
+	ID          string  `json:"id"`
+	Name        string  `json:"summary"`
+	Description string  `json:"description"`
+	Teams       []*Team `json:"teams"`
 }
 
 func (c *Client) Schedules() ([]*Schedule, error) {

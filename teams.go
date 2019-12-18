@@ -8,18 +8,18 @@ import (
 )
 
 type PDTeams struct {
-	Teams  []*PDTeam `json:"teams"`
-	Limit  int       `json:"limit,omitempty"`
-	Offset int       `json:"offset,omitempty"`
-	More   bool      `json:"more,omitempty"`
+	Teams  []*Team `json:"teams"`
+	Limit  int     `json:"limit,omitempty"`
+	Offset int     `json:"offset,omitempty"`
+	More   bool    `json:"more,omitempty"`
 }
 
-type PDTeam struct {
+type Team struct {
 	ID   string `json:"id"`
 	Name string `json:"summary"`
 }
 
-func (c *Client) Teams() ([]*PDTeam, error) {
+func (c *Client) Teams() ([]*Team, error) {
 	c.BaseURL.Path = "/teams"
 	q := c.BaseURL.Query()
 	var offset int

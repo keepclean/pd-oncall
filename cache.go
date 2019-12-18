@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/jedib0t/go-pretty/text"
 )
 
 type CacheFile string
@@ -79,4 +81,23 @@ func (c CacheFile) Read() ([]*Schedule, error) {
 	}
 
 	return t, nil
+}
+
+func (c CacheFile) Remove() {
+	cf := c.ExpandPath()
+	if err := os.Remove(cf); err != nil {
+		log.Fatalln("can not remove cache file", cf, err)
+	}
+
+	log.Println("Cache file", cf, "has been removed")
+}
+
+func (c CacheFile) Show() {
+	cache, err := c.Read()
+	if err != nil {
+		log.Fatalln("can not read the cache file", c.ExpandPath(), err)
+	}
+
+	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
+	fmt.Println(jsonPrettyPrinter(cache))
 }
