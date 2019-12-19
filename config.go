@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -181,4 +182,37 @@ func getUserInput(prompt string) ([]int, error) {
 	}
 
 	return result, nil
+}
+
+func printUserAsTable(users map[string]string) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
+	defer w.Flush()
+
+	userKeys := []string{}
+	for id := range users {
+		userKeys = append(userKeys, id)
+	}
+
+	sort.Slice(userKeys, func(i, j int) bool { return userKeys[i] < userKeys[j] })
+
+	lenUsers := len(users)
+	rows := rowsNumber(lenUsers)
+	columns := lenUsers / rows
+	remainder := lenUsers % rows
+	startFrom := 1
+
+	for r := 0; r < rows; r++ {
+		var s string
+		for c := 0; c < columns; c++ {
+			index := c*rows + r
+			s += fmt.Sprintf("%d) %s\t", index+startFrom, users[userKeys[index]])
+		}
+
+		if remainder > 0 {
+			s += fmt.Sprintf("%d) %s\t", lenUsers-remainder+startFrom, users[userKeys[lenUsers-remainder]])
+			remainder--
+		}
+
+		fmt.Fprintln(w, s)
+	}
 }

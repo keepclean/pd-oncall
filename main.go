@@ -54,7 +54,7 @@ func main() {
 		}
 		cf.Create(pdSchedules)
 	}
-	schedules := cf.Read()
+	cfg := cf.Read()
 
 	switch cmd {
 	case config.FullCommand():
@@ -70,18 +70,18 @@ func main() {
 		}
 		sc.Show()
 	case now.FullCommand():
-		oncallNow(apiClient, schedules, *tableStyle)
+		oncallNow(apiClient, cfg, *tableStyle)
 	case schedule.FullCommand():
 		scheduleDates.CheckDates()
-		oncallShift(apiClient, schedules, scheduleDates.Since, scheduleDates.Until, *tableStyle)
+		oncallShift(apiClient, cfg, scheduleDates.Since, scheduleDates.Until, *tableStyle)
 	case report.FullCommand():
 		reportDates.CheckDates()
-		oncallReport(apiClient, schedules, reportDates.Since, reportDates.Until, *tableStyle)
+		oncallReport(apiClient, cfg, reportDates.Since, reportDates.Until, *tableStyle)
 	case roster.FullCommand():
 		rosterDates.CheckDates()
-		oncallRoster(apiClient, schedules, rosterDates.Since, rosterDates.Until, *tableStyle)
+		oncallRoster(apiClient, cfg, rosterDates.Since, rosterDates.Until, *tableStyle)
 	case user.FullCommand():
 		userDates.CheckDates()
-		oncallRoster(apiClient, schedules, rosterDates.Since, rosterDates.Until, *tableStyle)
+		oncallUser(apiClient, cfg, userDates.Since, userDates.Until, *tableStyle)
 	}
 }
