@@ -28,12 +28,12 @@ func (c ConfigFile) Create(t []*Schedule) {
 
 	printSchedulesAsTable(t)
 
-	teamsNumbers, err := getUserInput("Please select numbers, separate them by commas: ")
+	scheduleNumbers, err := getUserInput("Please select numbers, separate them by commas: ")
 	if err != nil {
 		log.Fatalln("[ConfigFile.Create] fail to read user input:", err)
 	}
 
-	c.Write(t, teamsNumbers)
+	c.Write(t, scheduleNumbers)
 }
 
 func (c ConfigFile) Exist() bool {
@@ -52,14 +52,14 @@ func (c ConfigFile) ExpandPath() string {
 	return os.ExpandEnv(c.String())
 }
 
-func (c ConfigFile) Write(t []*Schedule, teamsNumbers []int) {
+func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) {
 	lenT := len(t)
 	tSubset := make([]*Schedule, 0)
 	users := make(map[string]string)
 
-	for _, n := range teamsNumbers {
+	for _, n := range scheduleNumbers {
 		if n > lenT || n < 1 {
-			log.Println("There is no a team with number in the list:", n)
+			log.Println("There is no schedule with number in the list:", n)
 			continue
 		}
 
