@@ -8,35 +8,35 @@ import (
 )
 
 func main() {
-	app := kingpin.New("pd-oncall", "A command-line tool for represeting PagerDuty oncall schedule.")
-	apiToken := app.Flag("api-token", "Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN;").Envar("PAGERDUTY_API_TOKEN").Required().String()
-	apiURL := app.Flag("api-url", "API URL.").Default("https://api.pagerduty.com/").URL()
-	tableStyle := app.Flag("table-style", "Table style: rounded, box, colored").Default("rounded").String()
+	app := kingpin.New("pd-oncall", "A command-line tool for represeting PagerDuty oncall schedules")
+	apiToken := app.Flag("api-token", "Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN").Envar("PAGERDUTY_API_TOKEN").Required().String()
+	apiURL := app.Flag("api-url", "Pager Duty API URL").Default("https://api.pagerduty.com/").URL()
+	tableStyle := app.Flag("table-style", "Available table styles: rounded, box, colored").Default("rounded").String()
 
 	version := "0.0.0"
 	app.Version(version)
 
-	config := app.Command("config", "sub command for managing a config file")
-	configRm := config.Flag("rm", "remove config file").Bool()
-	config.Flag("show", "show config file").Bool()
+	config := app.Command("config", "simple management of a config file")
+	configRm := config.Flag("rm", "remove a config file").Bool()
+	config.Flag("show", "show a config file").Bool()
 	// configFile := config.Flag("file", "Path to config file").Default("${HOME}/.config/pd-oncall/config.json").String()
 
-	cache := app.Command("cache", "sub command for managing a cache file")
-	cacheRm := cache.Flag("rm", "remove cache file").Bool()
-	cache.Flag("show", "show cache file").Bool()
+	cache := app.Command("cache", "simple management of a cache file")
+	cacheRm := cache.Flag("rm", "remove a cache file").Bool()
+	cache.Flag("show", "show a cache file").Bool()
 
 	now := app.Command("now", "list currently oncall for schedules in a config file")
 
-	schedule := app.Command("schedule", "Oncall schedule information")
+	schedule := app.Command("schedule", "oncall schedule information")
 	scheduleDates := NewDates(schedule)
 
-	report := app.Command("report", "generates report")
+	report := app.Command("report", "generates a simple oncall report")
 	reportDates := NewDates(report)
 
 	roster := app.Command("roster", "roster for all known schedules")
 	rosterDates := NewDates(roster)
 
-	user := app.Command("user", "oncall schedule for user")
+	user := app.Command("user", "oncall schedule for a specific user")
 	userDates := NewDates(user)
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
