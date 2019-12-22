@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	app := kingpin.New("pd-oncall", "A command-line tool for represeting PagerDuty oncall schedules")
+	app := kingpin.New("pd-oncall", "A command-line tool for representing PagerDuty oncall schedules")
 	apiToken := app.Flag("api-token", "Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN").Envar("PAGERDUTY_API_TOKEN").Required().String()
 	apiURL := app.Flag("api-url", "Pager Duty API URL").Default("https://api.pagerduty.com/").URL()
 	tableStyle := app.Flag("table-style", "Available table styles: rounded, box, colored").Default("rounded").String()
