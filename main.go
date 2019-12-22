@@ -17,11 +17,12 @@ func main() {
 	app.Version(version)
 
 	config := app.Command("config", "simple management of a config file")
+	configFile := app.Flag("config-file", "path to a config file").Default("${HOME}/.config/pd-oncall/config.json").String()
 	configRm := config.Flag("rm", "remove a config file").Bool()
 	config.Flag("show", "show a config file").Bool()
-	// configFile := config.Flag("file", "Path to config file").Default("${HOME}/.config/pd-oncall/config.json").String()
 
 	cache := app.Command("cache", "simple management of a cache file")
+	cacheFile := app.Flag("cache-file", "path to a cache file").Default("${HOME}/.cache/pd-oncall/cache.json").String()
 	cacheRm := cache.Flag("rm", "remove a cache file").Bool()
 	cache.Flag("show", "show a cache file").Bool()
 
@@ -42,8 +43,8 @@ func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
 
-	var cf ConfigFile = "${HOME}/.config/pd-oncall/config.json"
-	var sc CacheFile = "${HOME}/.cache/pd-oncall/schedules-cache.json"
+	cf := ConfigFile(*configFile)
+	sc := CacheFile(*cacheFile)
 	if !cf.Exist() {
 		log.Printf("Config file %s doesn't exist;\n", cf)
 

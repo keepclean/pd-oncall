@@ -20,7 +20,7 @@ func printTable(data []table.Row, fields table.Row, title, style, sortBy string,
 		t.SetTitle(title)
 	}
 	if sortBy != "" {
-		t.SortBy([]table.SortBy{{Name: sortBy, Mode: table.Dsc}})
+		t.SortBy([]table.SortBy{{Name: sortBy, Mode: sortMode}})
 	}
 	t.AppendHeader(fields)
 	t.AppendRows(data)
