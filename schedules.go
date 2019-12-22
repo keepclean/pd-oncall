@@ -123,10 +123,11 @@ func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, e
 	if err != nil {
 		return &PDScheduleResponse{}, err
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return &PDScheduleResponse{}, fmt.Errorf("%s", resp.Status)
 	}
-	defer resp.Body.Close()
 
 	var r PDScheduleResponse
 	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {

@@ -38,9 +38,13 @@ func (c CacheFile) Create(apiClient *Client) {
 
 func (c CacheFile) Exist() bool {
 	fInfo, err := os.Stat(c.ExpandPath())
-	if os.IsNotExist(err) {
+	if err != nil && os.IsNotExist(err) {
+		return false
+	} else if err != nil {
+		log.Println("non-IsNotExist error upon calling os.Stat:", err)
 		return false
 	}
+
 	// if modification of file more than four weeks, refresh it
 	if time.Since(fInfo.ModTime()) > (time.Hour * 672) {
 		return false

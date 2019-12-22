@@ -37,7 +37,10 @@ func (c ConfigFile) Create(t []*Schedule) {
 }
 
 func (c ConfigFile) Exist() bool {
-	if _, err := os.Stat(c.ExpandPath()); os.IsNotExist(err) {
+	if _, err := os.Stat(c.ExpandPath()); err != nil && os.IsNotExist(err) {
+		return false
+	} else if err != nil {
+		log.Println("non-IsNotExist error upon calling os.Stat:", err)
 		return false
 	}
 
@@ -99,7 +102,7 @@ func (c ConfigFile) Remove() {
 func (c ConfigFile) Read() *Schedules {
 	f, err := os.Open(c.ExpandPath())
 	if err != nil {
-		log.Fatalln("can not open the config file", c.ExpandPath(), err)
+		log.Fatalln("[ConfigFile.Read.os.Open]:", err)
 	}
 	defer f.Close()
 
