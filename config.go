@@ -184,7 +184,7 @@ func getUserInput(prompt string) ([]int, error) {
 	return result, nil
 }
 
-func printUserAsTable(users map[string]string) {
+func printUserAsTable(users map[string]string) []string {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 	defer w.Flush()
 
@@ -215,4 +215,6 @@ func printUserAsTable(users map[string]string) {
 
 		fmt.Fprintln(w, s)
 	}
+
+	return userKeys
 }
