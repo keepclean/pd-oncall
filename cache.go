@@ -14,7 +14,7 @@ import (
 type CacheFile string
 
 func (c CacheFile) String() string {
-	return fmt.Sprint(string(c))
+	return string(c)
 }
 
 func (c CacheFile) Create(apiClient *Client) {

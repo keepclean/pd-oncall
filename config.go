@@ -18,7 +18,7 @@ import (
 type ConfigFile string
 
 func (c ConfigFile) String() string {
-	return fmt.Sprint(string(c))
+	return string(c)
 }
 
 func (c ConfigFile) Create(t []*Schedule) {
