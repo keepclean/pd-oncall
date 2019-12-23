@@ -17,23 +17,29 @@ func (c CacheFile) String() string {
 	return string(c)
 }
 
-func (c CacheFile) Create(apiClient *Client) {
+func (c CacheFile) Create(apiClient *Client) error {
 	if c.Exist() {
-		return
+		return nil
 	}
 
 	log.Printf("Cache file %s doesn't exist; Creating it...\n", c)
 
 	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
 		log.Fatalln("can't create directory for cache file: ", err)
+		return err
 	}
 
 	schedules, err := apiClient.Schedules()
 	if err != nil {
-		log.Println("failt to query PD API: ", err)
+		log.Println("fail to query API: ", err)
+		return err
 	}
 
-	c.Write(schedules)
+	if err := c.Write(schedules); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c CacheFile) Exist() bool {
@@ -61,15 +67,19 @@ func (c CacheFile) ExpandPath() string {
 	return os.ExpandEnv(c.String())
 }
 
-func (c CacheFile) Write(t []*Schedule) {
+func (c CacheFile) Write(t []*Schedule) error {
 	f, err := os.Create(c.ExpandPath())
 	if err != nil {
 		log.Println("can't create file: ", err)
+		return err
 	}
 
 	if err = json.NewEncoder(f).Encode(t); err != nil {
 		log.Println("can't write json: ", err)
+		return err
 	}
+
+	return nil
 }
 
 func (c CacheFile) Read() ([]*Schedule, error) {
@@ -87,13 +97,15 @@ func (c CacheFile) Read() ([]*Schedule, error) {
 	return t, nil
 }
 
-func (c CacheFile) Remove() {
+func (c CacheFile) Remove() error {
 	cf := c.ExpandPath()
 	if err := os.Remove(cf); err != nil {
-		log.Fatalln("can not remove cache file", cf, err)
+		log.Println("can not remove cache file:", err)
+		return err
 	}
 
 	log.Println("Cache file", cf, "has been removed")
+	return nil
 }
 
 func (c CacheFile) Show() {

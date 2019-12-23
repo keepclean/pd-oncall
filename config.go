@@ -38,6 +38,7 @@ func (c ConfigFile) Create(t []*Schedule) {
 
 func (c ConfigFile) Exist() bool {
 	if _, err := os.Stat(c.ExpandPath()); err != nil && os.IsNotExist(err) {
+		log.Printf("config file %s doesn't exist\n", c)
 		return false
 	} else if err != nil {
 		log.Println("non-IsNotExist error upon calling os.Stat:", err)

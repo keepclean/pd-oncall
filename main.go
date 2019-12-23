@@ -12,6 +12,7 @@ func main() {
 	apiToken := app.Flag("api-token", "Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN").Envar("PAGERDUTY_API_TOKEN").Required().String()
 	apiURL := app.Flag("api-url", "Pager Duty API URL").Default("https://api.pagerduty.com/").URL()
 	tableStyle := app.Flag("table-style", "Available table styles: rounded, box, colored").Default("rounded").String()
+	timeout := app.Flag("timeout", "Timeout for a single http requests to API").Default("10s").Duration()
 
 	version := "0.0.0"
 	app.Version(version)
@@ -41,17 +42,26 @@ func main() {
 	userDates := NewDates(user)
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
-	apiClient := NewPDApiClient(*apiURL, version, *apiToken)
+	apiClient := NewPDApiClient(*apiURL, version, *apiToken, *timeout)
 
 	cf := ConfigFile(*configFile)
 	sc := CacheFile(*cacheFile)
 	if !cf.Exist() {
-		log.Printf("Config file %s doesn't exist;\n", cf)
+		if err := sc.Create(apiClient); err != nil {
+			_ = sc.Remove()
+			log.Fatalln("can't create cache file:", err)
+		}
 
-		sc.Create(apiClient)
 		pdSchedules, err := sc.Read()
 		if err != nil {
 			log.Fatalln("fail to read schedules cache file:", err)
+		}
+
+		if len(pdSchedules) == 0 {
+			_ = sc.Remove()
+			log.Fatalln(
+				"cache file for schedules is empty, can't create config file;",
+				"cache file was removed")
 		}
 		cf.Create(pdSchedules)
 	}
@@ -66,7 +76,9 @@ func main() {
 		cf.Show()
 	case cache.FullCommand():
 		if *cacheRm {
-			sc.Remove()
+			if err := sc.Remove(); err != nil {
+				log.Fatalln(err)
+			}
 			return
 		}
 		sc.Show()
