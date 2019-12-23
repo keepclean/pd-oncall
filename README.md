@@ -1,9 +1,6 @@
 # pd-oncall
 
-WIP
-
 A command-line tool for representing Pager Duty oncall schedule.
-It is the re-work of `keepclean/oncall` project.
 
 ## usage
 ```sh
@@ -17,6 +14,7 @@ pd-oncall --api-token=API-TOKEN [<flags>] <command> [<args> ...]
 --api-url=https://api.pagerduty.com/
                          Pager Duty API URL
 --table-style="rounded"  Available table styles: rounded, box, colored
+--timeout=10s            Timeout for a single http requests to Pager Duty API
 --version                Show application version.
 ```
 
