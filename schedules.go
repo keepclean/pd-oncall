@@ -30,8 +30,6 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 	q.Set("offset", strconv.Itoa(offset))
 	c.BaseURL.RawQuery = q.Encode()
 
-	var schedules Schedules
-
 	req, err := http.NewRequest("GET", c.BaseURL.String(), nil)
 	if err != nil {
 		return nil, err
@@ -40,6 +38,9 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
 	req.Header.Set("Authorization", fmt.Sprintf("Token token=%s", c.Token))
 	req.Header.Set("User-Agent", c.UserAgent)
+
+	var schedules Schedules
+	initialTimeout := c.httpClient.Timeout
 
 	for {
 		resp, err := c.httpClient.Do(req)
@@ -62,6 +63,8 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 		q.Set("offset", strconv.Itoa(offset))
 		c.BaseURL.RawQuery = q.Encode()
 		req.URL = c.BaseURL
+		// reset timeout due to `req` is re-used in this loop
+		c.httpClient.Timeout = initialTimeout
 	}
 
 	return schedules.Schedules, nil
