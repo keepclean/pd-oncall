@@ -7,7 +7,7 @@ A command-line tool for representing Pager Duty oncall schedule.
 pd-oncall --api-token=API-TOKEN [<flags>] <command> [<args> ...]
 ```
 
-### flags:
+### flags
 ```
 --help                   Show context-sensitive help (also try --help-long and --help-man).
 --api-token=API-TOKEN    Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN
@@ -18,7 +18,7 @@ pd-oncall --api-token=API-TOKEN [<flags>] <command> [<args> ...]
 --version                Show application version.
 ```
 
-### commands:
+### commands
 ```
 help [<command>...]
   Show help.
