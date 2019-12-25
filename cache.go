@@ -25,7 +25,7 @@ func (c CacheFile) Create(apiClient *Client) error {
 	log.Printf("Cache file %s doesn't exist; Creating it...\n", c)
 
 	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
-		log.Fatalln("can't create directory for cache file: ", err)
+		log.Fatalln("can't create directory for cache file:", err)
 		return err
 	}
 

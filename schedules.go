@@ -40,7 +40,6 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 	req.Header.Set("User-Agent", c.UserAgent)
 
 	var schedules Schedules
-	initialTimeout := c.httpClient.Timeout
 
 	for {
 		resp, err := c.httpClient.Do(req)
@@ -63,8 +62,6 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 		q.Set("offset", strconv.Itoa(offset))
 		c.BaseURL.RawQuery = q.Encode()
 		req.URL = c.BaseURL
-		// reset timeout due to `req` is re-used in this loop
-		c.httpClient.Timeout = initialTimeout
 	}
 
 	return schedules.Schedules, nil
