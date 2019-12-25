@@ -12,7 +12,7 @@ func main() {
 	apiToken := app.Flag("api-token", "Auth API token; Might be an environment variable PAGERDUTY_API_TOKEN").Envar("PAGERDUTY_API_TOKEN").Required().String()
 	apiURL := app.Flag("api-url", "Pager Duty API URL").Default("https://api.pagerduty.com/").URL()
 	tableStyle := app.Flag("table-style", "Available table styles: rounded, box, colored").Default("rounded").String()
-	timeout := app.Flag("timeout", "Timeout for a single http requests to API").Default("10s").Duration()
+	timeout := app.Flag("timeout", "Timeout for a single http request to API").Default("10s").Duration()
 
 	version := "0.0.0"
 	app.Version(version)
