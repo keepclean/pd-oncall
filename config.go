@@ -21,19 +21,40 @@ func (c ConfigFile) String() string {
 	return string(c)
 }
 
-func (c ConfigFile) Create(t []*Schedule) {
-	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
-		log.Fatalln("can't create directory for cache file: ", err)
+func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
+	if !cacheFile.Exist() {
+		log.Printf("Cache file %s doesn't exist; Creating it...\n", cacheFile)
+
+		if err := cacheFile.Create(apiClient); err != nil {
+			_ = cacheFile.Remove()
+			log.Fatalln("can't create cache file:", err)
+		}
 	}
 
-	printSchedulesAsTable(t)
+	pdSchedules, err := cacheFile.Read()
+	if err != nil {
+		log.Fatalln("fail to read schedules cache file:", err)
+	}
+
+	if len(pdSchedules) == 0 {
+		_ = cacheFile.Remove()
+		log.Fatalln(
+			"cache file for schedules is empty, can't create config file;",
+			"cache file was removed")
+	}
+
+	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
+		log.Fatalln("can't create directory for config file: ", err)
+	}
+
+	printSchedulesAsTable(pdSchedules)
 
 	scheduleNumbers, err := getUserInput("Please select numbers, separate them by commas: ")
 	if err != nil {
 		log.Fatalln("[ConfigFile.Create] fail to read user input:", err)
 	}
 
-	if err := c.Write(t, scheduleNumbers); err != nil {
+	if err := c.Write(pdSchedules, scheduleNumbers); err != nil {
 		log.Fatalln(err)
 	}
 }

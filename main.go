@@ -18,12 +18,12 @@ func main() {
 	app.Version(version)
 
 	config := app.Command("config", "simple management of a config file")
-	configFile := app.Flag("config-file", "path to a config file").Default("${HOME}/.config/pd-oncall/config.json").String()
+	configFilePath := app.Flag("config-file", "path to a config file").Default("${HOME}/.config/pd-oncall/config.json").String()
 	configRm := config.Flag("rm", "remove a config file").Bool()
 	config.Flag("show", "show a config file").Bool()
 
 	cache := app.Command("cache", "simple management of a cache file")
-	cacheFile := app.Flag("cache-file", "path to a cache file").Default("${HOME}/.cache/pd-oncall/cache.json").String()
+	cacheFilePath := app.Flag("cache-file", "path to a cache file").Default("${HOME}/.cache/pd-oncall/cache.json").String()
 	cacheRm := cache.Flag("rm", "remove a cache file").Bool()
 	cache.Flag("show", "show a cache file").Bool()
 
@@ -44,44 +44,28 @@ func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken, *timeout)
 
-	cf := ConfigFile(*configFile)
-	sc := CacheFile(*cacheFile)
-	if !cf.Exist() {
-		if err := sc.Create(apiClient); err != nil {
-			_ = sc.Remove()
-			log.Fatalln("can't create cache file:", err)
-		}
-
-		pdSchedules, err := sc.Read()
-		if err != nil {
-			log.Fatalln("fail to read schedules cache file:", err)
-		}
-
-		if len(pdSchedules) == 0 {
-			_ = sc.Remove()
-			log.Fatalln(
-				"cache file for schedules is empty, can't create config file;",
-				"cache file was removed")
-		}
-		cf.Create(pdSchedules)
+	configFile := ConfigFile(*configFilePath)
+	cacheFile := CacheFile(*cacheFilePath)
+	if !configFile.Exist() {
+		configFile.Create(apiClient, cacheFile)
 	}
-	cfg := cf.Read()
+	cfg := configFile.Read()
 
 	switch cmd {
 	case config.FullCommand():
 		if *configRm {
-			cf.Remove()
+			configFile.Remove()
 			return
 		}
-		cf.Show()
+		configFile.Show()
 	case cache.FullCommand():
 		if *cacheRm {
-			if err := sc.Remove(); err != nil {
+			if err := cacheFile.Remove(); err != nil {
 				log.Fatalln(err)
 			}
 			return
 		}
-		sc.Show()
+		cacheFile.Show()
 	case now.FullCommand():
 		oncallNow(apiClient, cfg, *tableStyle)
 	case schedule.FullCommand():

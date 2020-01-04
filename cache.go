@@ -18,12 +18,6 @@ func (c CacheFile) String() string {
 }
 
 func (c CacheFile) Create(apiClient *Client) error {
-	if c.Exist() {
-		return nil
-	}
-
-	log.Printf("Cache file %s doesn't exist; Creating it...\n", c)
-
 	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
 		log.Fatalln("can't create directory for cache file:", err)
 		return err
@@ -52,7 +46,7 @@ func (c CacheFile) Exist() bool {
 	}
 
 	// if modification of file more than four weeks, refresh it
-	if time.Since(fInfo.ModTime()) > (time.Hour * 672) {
+	if time.Since(fInfo.ModTime()) > (time.Hour * 24 * 7 * 4) {
 		return false
 	}
 
