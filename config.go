@@ -33,7 +33,9 @@ func (c ConfigFile) Create(t []*Schedule) {
 		log.Fatalln("[ConfigFile.Create] fail to read user input:", err)
 	}
 
-	c.Write(t, scheduleNumbers)
+	if err := c.Write(t, scheduleNumbers); err != nil {
+		log.Fatalln(err)
+	}
 }
 
 func (c ConfigFile) Exist() bool {
@@ -56,7 +58,7 @@ func (c ConfigFile) ExpandPath() string {
 	return os.ExpandEnv(c.String())
 }
 
-func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) {
+func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
 	lenT := len(t)
 	tSubset := make([]*Schedule, 0)
 	users := make(map[string]string)
@@ -82,13 +84,16 @@ func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) {
 
 	f, err := os.Create(c.ExpandPath())
 	if err != nil {
-		log.Println("can't create file: ", err)
+		return fmt.Errorf("can't create file: %v", err)
 	}
+	defer f.Close()
 
 	var cf Schedules = Schedules{Schedules: tSubset, Users: users}
 	if err = json.NewEncoder(f).Encode(cf); err != nil {
-		log.Println("can't write json: ", err)
+		return fmt.Errorf("can't write json: %v", err)
 	}
+
+	return nil
 }
 
 func (c ConfigFile) Remove() {
@@ -192,7 +197,7 @@ func printUserAsTable(users map[string]string) []string {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 1, ' ', tabwriter.Debug)
 	defer w.Flush()
 
-	userKeys := []string{}
+	userKeys := make([]string, 0, len(users))
 	for id := range users {
 		userKeys = append(userKeys, id)
 	}

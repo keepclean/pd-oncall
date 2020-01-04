@@ -73,6 +73,7 @@ func (c CacheFile) Write(t []*Schedule) error {
 		log.Println("can't create file: ", err)
 		return err
 	}
+	defer f.Close()
 
 	if err = json.NewEncoder(f).Encode(t); err != nil {
 		log.Println("can't write json: ", err)
