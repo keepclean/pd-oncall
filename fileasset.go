@@ -43,3 +43,12 @@ func (f FileAsset) Remove() error {
 	log.Printf("file %q has been removed\n", f)
 	return nil
 }
+
+func (f FileAsset) CreateDirs() error {
+	if err := os.MkdirAll(f.DirName(), 0755); err != nil {
+		log.Printf("can't create directory chain for %q file: %v\n", f, err)
+		return err
+	}
+
+	return nil
+}

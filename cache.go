@@ -15,8 +15,7 @@ type CacheFile struct {
 }
 
 func (c CacheFile) Create(apiClient *Client) error {
-	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
-		log.Fatalln("can't create directory for cache file:", err)
+	if err := c.CreateDirs(); err != nil {
 		return err
 	}
 

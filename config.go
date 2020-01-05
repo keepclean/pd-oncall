@@ -40,8 +40,8 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 			"cache file was removed")
 	}
 
-	if err := os.MkdirAll(c.DirName(), 0755); err != nil {
-		log.Fatalln("can't create directory for config file: ", err)
+	if err := c.CreateDirs(); err != nil {
+		log.Fatalln(err)
 	}
 
 	printSchedulesAsTable(pdSchedules)
