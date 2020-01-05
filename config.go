@@ -20,8 +20,6 @@ type ConfigFile struct {
 
 func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 	if !cacheFile.Exist() || cacheFile.Stale() {
-		log.Printf("Cache file %s doesn't exist; Creating it...\n", cacheFile)
-
 		if err := cacheFile.Create(apiClient); err != nil {
 			_ = cacheFile.Remove()
 			log.Fatalln("can't create cache file:", err)
@@ -33,7 +31,7 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 		log.Fatalln("fail to read schedules cache file:", err)
 	}
 
-	if len(pdSchedules) == 0 {
+	if len(pdSchedules.Schedules) == 0 {
 		_ = cacheFile.Remove()
 		log.Fatalln(
 			"cache file for schedules is empty, can't create config file;",
@@ -44,14 +42,14 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 		log.Fatalln(err)
 	}
 
-	printSchedulesAsTable(pdSchedules)
+	printSchedulesAsTable(pdSchedules.Schedules)
 
 	scheduleNumbers, err := getUserInput("Please select numbers, separate them by commas: ")
 	if err != nil {
 		log.Fatalln("[ConfigFile.Create] fail to read user input:", err)
 	}
 
-	if err := c.Write(pdSchedules, scheduleNumbers); err != nil {
+	if err := c.Write(pdSchedules.Schedules, scheduleNumbers); err != nil {
 		log.Fatalln(err)
 	}
 }

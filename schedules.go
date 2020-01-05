@@ -23,7 +23,7 @@ type Schedule struct {
 	Users       []*User `json:"users,omitempty"`
 }
 
-func (c *Client) Schedules() ([]*Schedule, error) {
+func (c *Client) Schedules() (*Schedules, error) {
 	c.BaseURL.Path = "/schedules"
 	q := c.BaseURL.Query()
 	var offset int
@@ -64,7 +64,7 @@ func (c *Client) Schedules() ([]*Schedule, error) {
 		req.URL = c.BaseURL
 	}
 
-	return schedules.Schedules, nil
+	return &schedules, nil
 }
 
 type PDScheduleResponse struct {

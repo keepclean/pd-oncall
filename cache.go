@@ -47,7 +47,7 @@ func (c CacheFile) Stale() bool {
 	return true
 }
 
-func (c CacheFile) Write(t []*Schedule) error {
+func (c CacheFile) Write(s *Schedules) error {
 	f, err := os.Create(c.ExpandPath())
 	if err != nil {
 		log.Println("can't create file: ", err)
@@ -55,7 +55,7 @@ func (c CacheFile) Write(t []*Schedule) error {
 	}
 	defer f.Close()
 
-	if err = json.NewEncoder(f).Encode(t); err != nil {
+	if err = json.NewEncoder(f).Encode(s); err != nil {
 		log.Println("can't write json: ", err)
 		return err
 	}
@@ -63,19 +63,19 @@ func (c CacheFile) Write(t []*Schedule) error {
 	return nil
 }
 
-func (c CacheFile) Read() ([]*Schedule, error) {
+func (c CacheFile) Read() (*Schedules, error) {
 	f, err := os.Open(c.ExpandPath())
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	var t []*Schedule
-	if err = json.NewDecoder(f).Decode(&t); err != nil {
+	var s *Schedules
+	if err = json.NewDecoder(f).Decode(&s); err != nil {
 		return nil, err
 	}
 
-	return t, nil
+	return s, nil
 }
 
 func (c CacheFile) Show() {
