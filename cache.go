@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/jedib0t/go-pretty/text"
 )
 
-type CacheFile string
-
-func (c CacheFile) String() string {
-	return string(c)
+type CacheFile struct {
+	FileAsset
 }
 
 func (c CacheFile) Create(apiClient *Client) error {
@@ -36,29 +33,19 @@ func (c CacheFile) Create(apiClient *Client) error {
 	return nil
 }
 
-func (c CacheFile) Exist() bool {
+func (c CacheFile) Stale() bool {
 	fInfo, err := os.Stat(c.ExpandPath())
-	if err != nil && os.IsNotExist(err) {
-		return false
-	} else if err != nil {
-		log.Println("non-IsNotExist error upon calling os.Stat:", err)
+	if err != nil {
+		log.Printf("couldn't check stat of %q file: %v", c, err)
 		return false
 	}
 
-	// if modification of file more than four weeks, refresh it
+	// if cache file was modified more than four weeks ago, refresh that file
 	if time.Since(fInfo.ModTime()) > (time.Hour * 24 * 7 * 4) {
 		return false
 	}
 
 	return true
-}
-
-func (c CacheFile) DirName() string {
-	return filepath.Dir(c.ExpandPath())
-}
-
-func (c CacheFile) ExpandPath() string {
-	return os.ExpandEnv(c.String())
 }
 
 func (c CacheFile) Write(t []*Schedule) error {
@@ -90,17 +77,6 @@ func (c CacheFile) Read() ([]*Schedule, error) {
 	}
 
 	return t, nil
-}
-
-func (c CacheFile) Remove() error {
-	cf := c.ExpandPath()
-	if err := os.Remove(cf); err != nil {
-		log.Println("can not remove cache file:", err)
-		return err
-	}
-
-	log.Println("Cache file", cf, "has been removed")
-	return nil
 }
 
 func (c CacheFile) Show() {

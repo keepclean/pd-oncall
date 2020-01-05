@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -15,14 +14,12 @@ import (
 	"github.com/jedib0t/go-pretty/text"
 )
 
-type ConfigFile string
-
-func (c ConfigFile) String() string {
-	return string(c)
+type ConfigFile struct {
+	FileAsset
 }
 
 func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
-	if !cacheFile.Exist() {
+	if !cacheFile.Exist() || cacheFile.Stale() {
 		log.Printf("Cache file %s doesn't exist; Creating it...\n", cacheFile)
 
 		if err := cacheFile.Create(apiClient); err != nil {
@@ -57,26 +54,6 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 	if err := c.Write(pdSchedules, scheduleNumbers); err != nil {
 		log.Fatalln(err)
 	}
-}
-
-func (c ConfigFile) Exist() bool {
-	if _, err := os.Stat(c.ExpandPath()); err != nil && os.IsNotExist(err) {
-		log.Printf("config file %s doesn't exist\n", c)
-		return false
-	} else if err != nil {
-		log.Println("non-IsNotExist error upon calling os.Stat:", err)
-		return false
-	}
-
-	return true
-}
-
-func (c ConfigFile) DirName() string {
-	return filepath.Dir(c.ExpandPath())
-}
-
-func (c ConfigFile) ExpandPath() string {
-	return os.ExpandEnv(c.String())
 }
 
 func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
@@ -115,15 +92,6 @@ func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
 	}
 
 	return nil
-}
-
-func (c ConfigFile) Remove() {
-	cf := c.ExpandPath()
-	if err := os.Remove(cf); err != nil {
-		log.Fatalln("can not remove config file", cf, err)
-	}
-
-	log.Println("Config file", cf, "has been removed")
 }
 
 func (c ConfigFile) Read() *Schedules {

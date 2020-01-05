@@ -44,8 +44,8 @@ func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	apiClient := NewPDApiClient(*apiURL, version, *apiToken, *timeout)
 
-	configFile := ConfigFile(*configFilePath)
-	cacheFile := CacheFile(*cacheFilePath)
+	configFile := ConfigFile{FileAsset{Path: *configFilePath}}
+	cacheFile := CacheFile{FileAsset{Path: *cacheFilePath}}
 	if !configFile.Exist() {
 		configFile.Create(apiClient, cacheFile)
 	}
@@ -54,7 +54,9 @@ func main() {
 	switch cmd {
 	case config.FullCommand():
 		if *configRm {
-			configFile.Remove()
+			if err := configFile.Remove(); err != nil {
+				log.Fatalln(err)
+			}
 			return
 		}
 		configFile.Show()
