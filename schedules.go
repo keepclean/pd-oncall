@@ -25,23 +25,24 @@ type Schedule struct {
 
 func (c *Client) Schedules() (*Schedules, error) {
 	c.BaseURL.Path = "/schedules"
-	q := c.BaseURL.Query()
 	var offset int
-	q.Set("offset", strconv.Itoa(offset))
-	c.BaseURL.RawQuery = q.Encode()
-
-	req, err := http.NewRequest("GET", c.BaseURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
-	req.Header.Set("Authorization", fmt.Sprintf("Token token=%s", c.Token))
-	req.Header.Set("User-Agent", c.UserAgent)
+	q := url.Values{}
 
 	var schedules Schedules
 
 	for {
+		q.Set("offset", strconv.Itoa(offset))
+		c.BaseURL.RawQuery = q.Encode()
+
+		req, err := http.NewRequest("GET", c.BaseURL.String(), nil)
+		if err != nil {
+			return nil, err
+		}
+
+		req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
+		req.Header.Set("Authorization", fmt.Sprintf("Token token=%s", c.Token))
+		req.Header.Set("User-Agent", c.UserAgent)
+
 		resp, err := c.httpClient.Do(req)
 		if err != nil {
 			return nil, err
@@ -59,9 +60,7 @@ func (c *Client) Schedules() (*Schedules, error) {
 		}
 
 		offset += tmp.Limit
-		q.Set("offset", strconv.Itoa(offset))
-		c.BaseURL.RawQuery = q.Encode()
-		req.URL = c.BaseURL
+		// req.URL = c.BaseURL
 	}
 
 	return &schedules, nil
