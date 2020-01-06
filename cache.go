@@ -2,12 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"time"
-
-	"github.com/jedib0t/go-pretty/text"
 )
 
 type CacheFile struct {
@@ -61,29 +58,4 @@ func (c CacheFile) Write(s *Schedules) error {
 	}
 
 	return nil
-}
-
-func (c CacheFile) Read() (*Schedules, error) {
-	f, err := os.Open(c.ExpandPath())
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	var s *Schedules
-	if err = json.NewDecoder(f).Decode(&s); err != nil {
-		return nil, err
-	}
-
-	return s, nil
-}
-
-func (c CacheFile) Show() {
-	cache, err := c.Read()
-	if err != nil {
-		log.Fatalln("can not read the cache file", c.ExpandPath(), err)
-	}
-
-	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
-	fmt.Println(jsonPrettyPrinter(cache))
 }

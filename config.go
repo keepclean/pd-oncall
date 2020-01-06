@@ -10,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"text/tabwriter"
-
-	"github.com/jedib0t/go-pretty/text"
 )
 
 type ConfigFile struct {
@@ -90,28 +88,6 @@ func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
 	}
 
 	return nil
-}
-
-func (c ConfigFile) Read() *Schedules {
-	f, err := os.Open(c.ExpandPath())
-	if err != nil {
-		log.Fatalln("[ConfigFile.Read.os.Open]:", err)
-	}
-	defer f.Close()
-
-	var cf Schedules
-	if err = json.NewDecoder(f).Decode(&cf); err != nil {
-		log.Fatalln("can not decode the config file", c.ExpandPath(), err)
-	}
-
-	return &cf
-}
-
-func (c ConfigFile) Show() {
-	cf := c.Read()
-
-	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
-	fmt.Println(jsonPrettyPrinter(cf))
 }
 
 func printSchedulesAsTable(t []*Schedule) {

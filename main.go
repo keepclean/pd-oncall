@@ -49,7 +49,11 @@ func main() {
 	if !configFile.Exist() {
 		configFile.Create(apiClient, cacheFile)
 	}
-	cfg := configFile.Read()
+
+	cfg, err := configFile.Read()
+	if err != nil {
+		log.Fatalln("can't read config file:", err)
+	}
 
 	switch cmd {
 	case config.FullCommand():

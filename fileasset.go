@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/jedib0t/go-pretty/text"
 )
 
 type FileAsset struct {
@@ -51,4 +55,29 @@ func (f FileAsset) CreateDirs() error {
 	}
 
 	return nil
+}
+
+func (f FileAsset) Read() (*Schedules, error) {
+	fd, err := os.Open(f.ExpandPath())
+	if err != nil {
+		return nil, err
+	}
+	defer fd.Close()
+
+	var s *Schedules
+	if err = json.NewDecoder(fd).Decode(&s); err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}
+
+func (f FileAsset) Show() {
+	data, err := f.Read()
+	if err != nil {
+		log.Fatalln("can not read the cache file", f.ExpandPath(), err)
+	}
+
+	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
+	fmt.Println(jsonPrettyPrinter(data))
 }
