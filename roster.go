@@ -10,7 +10,6 @@ import (
 )
 
 func oncallRoster(apiClient *Client, cf *Schedules, since, until, tableStyle string) {
-	var data []table.Row
 	fields := table.Row{"START", "DAY"}
 	var mutex = &sync.Mutex{}
 	var wg sync.WaitGroup
@@ -48,6 +47,7 @@ func oncallRoster(apiClient *Client, cf *Schedules, since, until, tableStyle str
 	}
 	wg.Wait()
 
+	data := make([]table.Row, 0, len(rawData))
 	for k, v := range rawData {
 		tmp := table.Row{k, v["day"]}
 		for _, s := range cf.Schedules {

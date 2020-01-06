@@ -54,7 +54,7 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 
 func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
 	lenT := len(t)
-	tSubset := make([]*Schedule, 0)
+	tSubset := make([]*Schedule, 0, len(scheduleNumbers))
 	users := make(map[string]string)
 
 	for _, n := range scheduleNumbers {
@@ -82,7 +82,7 @@ func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
 	}
 	defer f.Close()
 
-	var cf Schedules = Schedules{Schedules: tSubset, Users: users}
+	cf := Schedules{Schedules: tSubset, Users: users}
 	if err = json.NewEncoder(f).Encode(cf); err != nil {
 		return fmt.Errorf("can't write json: %v", err)
 	}
