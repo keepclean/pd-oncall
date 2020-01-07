@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"time"
@@ -42,20 +41,4 @@ func (c CacheFile) Stale() bool {
 	}
 
 	return true
-}
-
-func (c CacheFile) Write(s *Schedules) error {
-	f, err := os.Create(c.ExpandPath())
-	if err != nil {
-		log.Println("can't create file: ", err)
-		return err
-	}
-	defer f.Close()
-
-	if err = json.NewEncoder(f).Encode(s); err != nil {
-		log.Println("can't write json: ", err)
-		return err
-	}
-
-	return nil
 }

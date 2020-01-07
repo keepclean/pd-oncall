@@ -81,3 +81,17 @@ func (f FileAsset) Show() {
 	jsonPrettyPrinter := text.NewJSONTransformer("", "  ")
 	fmt.Println(jsonPrettyPrinter(data))
 }
+
+func (f FileAsset) Write(s *Schedules) error {
+	fd, err := os.Create(f.ExpandPath())
+	if err != nil {
+		return fmt.Errorf("can't create file: %v", err)
+	}
+	defer fd.Close()
+
+	if err = json.NewEncoder(fd).Encode(s); err != nil {
+		return fmt.Errorf("can't write json: %v", err)
+	}
+
+	return nil
+}

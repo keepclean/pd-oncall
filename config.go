@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -29,11 +28,12 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 		log.Fatalln("fail to read schedules cache file:", err)
 	}
 
-	if len(pdSchedules.Schedules) == 0 {
+	lenS := len(pdSchedules.Schedules)
+	if lenS == 0 {
 		_ = cacheFile.Remove()
 		log.Fatalln(
 			"cache file for schedules is empty, can't create config file;",
-			"cache file was removed")
+			"cache file has been removed")
 	}
 
 	if err := c.CreateDirs(); err != nil {
@@ -47,24 +47,17 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 		log.Fatalln("[ConfigFile.Create] fail to read user input:", err)
 	}
 
-	if err := c.Write(pdSchedules.Schedules, scheduleNumbers); err != nil {
-		log.Fatalln(err)
-	}
-}
-
-func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
-	lenT := len(t)
-	tSubset := make([]*Schedule, 0, len(scheduleNumbers))
+	pdSubset := make([]*Schedule, 0, len(scheduleNumbers))
 	users := make(map[string]string)
 
 	for _, n := range scheduleNumbers {
-		if n > lenT || n < 1 {
+		if n > lenS || n < 1 {
 			log.Println("There is no schedule with number in the list:", n)
 			continue
 		}
 
-		item := t[n-1]
-		tSubset = append(tSubset, &Schedule{item.ID, item.Name, item.Description, []*User{}})
+		item := pdSchedules.Schedules[n-1]
+		pdSubset = append(pdSubset, &Schedule{item.ID, item.Name, item.Description, []*User{}})
 		for _, user := range item.Users {
 			if user.Deleted != "" {
 				continue
@@ -76,18 +69,10 @@ func (c ConfigFile) Write(t []*Schedule, scheduleNumbers []int) error {
 		}
 	}
 
-	f, err := os.Create(c.ExpandPath())
-	if err != nil {
-		return fmt.Errorf("can't create file: %v", err)
+	cf := Schedules{Schedules: pdSubset, Users: users}
+	if err := c.Write(&cf); err != nil {
+		log.Fatalln(err)
 	}
-	defer f.Close()
-
-	cf := Schedules{Schedules: tSubset, Users: users}
-	if err = json.NewEncoder(f).Encode(cf); err != nil {
-		return fmt.Errorf("can't write json: %v", err)
-	}
-
-	return nil
 }
 
 func printSchedulesAsTable(t []*Schedule) {
