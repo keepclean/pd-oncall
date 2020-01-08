@@ -17,7 +17,6 @@ func (c CacheFile) Create(apiClient *Client) error {
 
 	schedules, err := apiClient.Schedules()
 	if err != nil {
-		log.Println("fail to query API: ", err)
 		return err
 	}
 

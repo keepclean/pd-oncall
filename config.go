@@ -18,8 +18,8 @@ type ConfigFile struct {
 func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 	if !cacheFile.Exist() || cacheFile.Stale() {
 		if err := cacheFile.Create(apiClient); err != nil {
-			_ = cacheFile.Remove()
-			log.Fatalln("can't create cache file:", err)
+			errRm := cacheFile.Remove()
+			log.Fatalln("can't create cache file:", err, errRm)
 		}
 	}
 
@@ -30,10 +30,10 @@ func (c ConfigFile) Create(apiClient *Client, cacheFile CacheFile) {
 
 	lenS := len(pdSchedules.Schedules)
 	if lenS == 0 {
-		_ = cacheFile.Remove()
+		errRm := cacheFile.Remove()
 		log.Fatalln(
 			"cache file for schedules is empty, can't create config file;",
-			"cache file has been removed")
+			"cache file has been removed", errRm)
 	}
 
 	if err := c.CreateDirs(); err != nil {

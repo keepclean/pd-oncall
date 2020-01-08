@@ -28,7 +28,7 @@ func (f FileAsset) DirName() string {
 
 func (f FileAsset) Exist() bool {
 	if _, err := os.Stat(f.ExpandPath()); err != nil && os.IsNotExist(err) {
-		log.Printf("file %q doesn't exist\n", f)
+		log.Printf("file %q doesn't exist\n", f.ExpandPath())
 		return false
 	} else if err != nil {
 		log.Println("non-IsNotExist error upon calling os.Stat:", err)
@@ -40,8 +40,7 @@ func (f FileAsset) Exist() bool {
 
 func (f FileAsset) Remove() error {
 	if err := os.Remove(f.ExpandPath()); err != nil {
-		log.Printf("can not remove %q file: %v\n", f, err)
-		return err
+		return fmt.Errorf("can not remove %q file: %v", f, err)
 	}
 
 	log.Printf("file %q has been removed\n", f.ExpandPath())
@@ -50,8 +49,7 @@ func (f FileAsset) Remove() error {
 
 func (f FileAsset) CreateDirs() error {
 	if err := os.MkdirAll(f.DirName(), 0755); err != nil {
-		log.Printf("can't create directory chain for %q file: %v\n", f.ExpandPath(), err)
-		return err
+		return fmt.Errorf("can't create directory chain for %q file: %v", f.ExpandPath(), err)
 	}
 
 	return nil
