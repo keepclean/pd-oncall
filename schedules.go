@@ -99,8 +99,7 @@ type User struct {
 func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, error) {
 	path := &url.URL{Path: fmt.Sprint("/schedules/", id)}
 	u := c.BaseURL.ResolveReference(path)
-	q := u.Query()
-	q.Set("include_oncall", "true")
+	q := url.Values{"include_oncall": []string{"true"}}
 	if startdate != "" {
 		q.Set("since", startdate)
 	}
