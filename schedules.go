@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -49,8 +51,18 @@ func (c *Client) Schedules() (*Schedules, error) {
 		}
 		defer resp.Body.Close()
 
+		respBody := bytes.NewBuffer(make([]byte, 0))
+		for {
+			_, err := io.CopyN(respBody, resp.Body, 1024)
+			if err == io.EOF {
+				break
+			} else if err != nil {
+				return nil, fmt.Errorf("error while reading body: %v", err)
+			}
+		}
+
 		var tmp Schedules
-		if err = json.NewDecoder(resp.Body).Decode(&tmp); err != nil {
+		if err = json.Unmarshal(respBody.Bytes(), &tmp); err != nil {
 			return nil, err
 		}
 		schedules.Schedules = append(schedules.Schedules, tmp.Schedules...)
