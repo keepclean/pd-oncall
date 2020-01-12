@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 type Schedules struct {
@@ -61,6 +63,14 @@ func (c *Client) Schedules() (*Schedules, error) {
 			}
 		}
 
+		if resp.StatusCode == http.StatusTooManyRequests {
+			log.Println("recieved 429 from API")
+			time.Sleep(time.Second)
+			continue
+		} else if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("recieved response from API with %d status code: %s", resp.StatusCode, respBody.String())
+		}
+
 		var tmp Schedules
 		if err = json.Unmarshal(respBody.Bytes(), &tmp); err != nil {
 			return nil, err
@@ -72,7 +82,6 @@ func (c *Client) Schedules() (*Schedules, error) {
 		}
 
 		offset += tmp.Limit
-		// req.URL = c.BaseURL
 	}
 
 	return &schedules, nil
