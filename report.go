@@ -26,7 +26,8 @@ func oncallReport(apiClient *Client, cf *Schedules, since, until, tableStyle str
 
 	schedule, err := apiClient.Schedule(ID, since, until)
 	if err != nil {
-		log.Fatalf("Failed to get schedule: %v", err)
+		log.Println("Failed to get schedule:", err)
+		return
 	}
 
 	parsedSchedule := make(map[string]map[string]uint)

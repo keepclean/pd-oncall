@@ -131,7 +131,7 @@ func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, e
 
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return &PDScheduleResponse{}, err
+		return nil, err
 	}
 
 	req.Header.Set("Accept", "application/vnd.pagerduty+json;version=2")
@@ -140,16 +140,26 @@ func (c *Client) Schedule(id, startdate, enddate string) (*PDScheduleResponse, e
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return &PDScheduleResponse{}, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
+	respBody := bytes.NewBuffer(make([]byte, 0))
+	for {
+		_, err := io.CopyN(respBody, resp.Body, 1024)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, fmt.Errorf("error while reading body: %v", err)
+		}
+	}
+
 	if resp.StatusCode != http.StatusOK {
-		return &PDScheduleResponse{}, fmt.Errorf("%s", resp.Status)
+		return nil, fmt.Errorf("recieved response from API with %d status code: %s", resp.StatusCode, respBody.String())
 	}
 
 	var r PDScheduleResponse
-	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {
+	if err = json.Unmarshal(respBody.Bytes(), &r); err != nil {
 		return nil, err
 	}
 
