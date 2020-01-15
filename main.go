@@ -59,7 +59,7 @@ func main() {
 	case config.FullCommand():
 		if *configRm {
 			if err := configFile.Remove(); err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 			return
 		}
@@ -67,7 +67,7 @@ func main() {
 	case cache.FullCommand():
 		if *cacheRm {
 			if err := cacheFile.Remove(); err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 			return
 		}

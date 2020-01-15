@@ -25,12 +25,12 @@ func NewDates(c *kingpin.CmdClause) *Dates {
 func (d *Dates) CheckDates() {
 	t1, err := time.Parse("2006-01-02", d.Since)
 	if err != nil {
-		log.Fatalln("[CheckDates] for", t1, err)
+		log.Fatalf("fail to parse date %s: %v\n", d.Since, err)
 	}
 
 	t2, err := time.Parse("2006-01-02", d.Until)
 	if err != nil {
-		log.Fatalln("[CheckDates] for", t2, err)
+		log.Fatalf("fail to parse date %s: %v\n", d.Since, err)
 	}
 
 	if t2.Sub(t1) < 0 {

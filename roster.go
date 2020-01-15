@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/jedib0t/go-pretty/table"
@@ -16,7 +17,7 @@ func oncallRoster(apiClient *Client, cf *Schedules, since, until, tableStyle str
 	rawData := make(map[string]map[string]string)
 
 	for _, shift := range cf.Schedules {
-		fields = append(fields, shift.Name)
+		fields = append(fields, prettyField(shift.Name))
 
 		wg.Add(1)
 		go func(id, name, t1, t2 string) {
@@ -61,4 +62,32 @@ func oncallRoster(apiClient *Client, cf *Schedules, since, until, tableStyle str
 
 	title := fmt.Sprintf("%s - %s", since, until)
 	printTable(data, fields, title, tableStyle, "", -1)
+}
+
+func prettyField(f string) string {
+	maxLineLenght := 20
+	if len(f) < maxLineLenght {
+		return f
+	}
+
+	var result, s []string
+	var l int
+	for _, item := range strings.Fields(f) {
+		if item == "-" {
+			continue
+		}
+
+		if l+len(item) > maxLineLenght {
+			result = append(result, strings.Join(s, " "))
+			s = []string{item}
+			l = len(item)
+			continue
+		}
+
+		s = append(s, item)
+		l += len(item)
+	}
+	result = append(result, strings.Join(s, " "))
+
+	return strings.Join(result, "\n")
 }
